@@ -29,8 +29,8 @@ void setup() {
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
 
-  // Handle HTTP requests
-  server.on("/environment", HTTP_GET, [](AsyncWebServerRequest *request){
+  // Handle HTTP request for temperature and humidity
+  server.on("/temperature-humidity", HTTP_GET, [](AsyncWebServerRequest *request){
     // Get data from the DHT22 sensor
     float temperature = dht.readTemperature();
     float humidity = dht.readHumidity();
@@ -41,11 +41,18 @@ void setup() {
       return;
     }
 
+    // Prepare JSON response
+    String json = "{\"temperature\":" + String(temperature) + ",\"humidity\":" + String(humidity) + "}";
+    request->send(200, "application/json", json);
+  });
+
+  // Handle HTTP request for soil moisture
+  server.on("/soil-moisture", HTTP_GET, [](AsyncWebServerRequest *request){
     // Get data from the soil moisture sensor
     int soilMoisture = analogRead(SOIL_SENSOR_PIN);
 
     // Prepare JSON response
-    String json = "{\"temperature\":" + String(temperature) + ",\"humidity\":" + String(humidity) + ",\"soilMoisture\":" + String(soilMoisture) + "}";
+    String json = "{\"soilMoisture\":" + String(soilMoisture) + "}";
     request->send(200, "application/json", json);
   });
 
@@ -56,7 +63,8 @@ void loop() {
   // Check for input from the serial port (USB)
   if (Serial.available()) {
     String input = Serial.readStringUntil('\n');
-    if (input == "GET /environment") {
+    
+    if (input == "GET /temperature-humidity") {
       // Get data from the DHT22 sensor
       float temperature = dht.readTemperature();
       float humidity = dht.readHumidity();
@@ -67,11 +75,17 @@ void loop() {
         return;
       }
 
+      // Prepare JSON response
+      String json = "{\"temperature\":" + String(temperature) + ",\"humidity\":" + String(humidity) + "}";
+      Serial.println(json);
+    }
+    
+    if (input == "GET /soil-moisture") {
       // Get data from the soil moisture sensor
       int soilMoisture = analogRead(SOIL_SENSOR_PIN);
 
       // Prepare JSON response
-      String json = "{\"temperature\":" + String(temperature) + ",\"humidity\":" + String(humidity) + ",\"soilMoisture\":" + String(soilMoisture) + "}";
+      String json = "{\"soilMoisture\":" + String(soilMoisture) + "}";
       Serial.println(json);
     }
   }
