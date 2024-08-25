@@ -16,7 +16,7 @@
 AsyncWebServer server(80);
 
 WiFiUDP udp;
-const int udpPort = 4000;
+const int udpPort = 6000;
 const IPAddress broadcastIP = ~WiFi.subnetMask() | WiFi.gatewayIP();
 
 // Hardcoded GUID
