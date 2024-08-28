@@ -2,7 +2,7 @@
 #include "sensors.h"
 
 #define DHTPIN 4           // Pin connected to the DHT22
-#define DHTTYPE DHT22      // Type of DHT sensor
+#define DHTTYPE DHT11      // Type of DHT sensor
 #define SOIL_SENSOR_PIN 34 // Pin connected to the soil moisture sensor
 
 extern const char* GUID;   // Externally defined GUID
