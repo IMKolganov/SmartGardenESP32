@@ -5,7 +5,7 @@
 
 // Constants
 const unsigned long maxPumpDuration = 30000; // Maximum pump run time (30 seconds)
-const unsigned long minInterval = 600000;    // Minimum interval between runs (10 minutes)
+const unsigned long minInterval = 60000;    // Minimum interval between runs (600000 = 10 minutes)
 
 // Structure to represent a pump
 struct Pump {
