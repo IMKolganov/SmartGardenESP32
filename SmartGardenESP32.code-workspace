@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "240907-033627-esp32dev",
+			"path": "C:/Users/Rackot/Documents/PlatformIO/Projects/240907-033627-esp32dev"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"functional": "cpp"
+		}
+	}
+}

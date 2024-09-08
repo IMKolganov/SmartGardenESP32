@@ -1,6 +1,8 @@
 #include <WiFi.h>
 #include "wifi_setup.h"
-#include "wifi_config.h"  // Include the Wi-Fi configuration file
+
+const char* ssid = "Your_SSID";
+const char* password = "Your_PASSWORD";
 
 void setupWiFi() {
   WiFi.mode(WIFI_STA);
