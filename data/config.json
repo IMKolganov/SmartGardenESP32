@@ -1,9 +1,9 @@
 {
-    "ssid": "Your_SSID",
-    "password": "Your_PASSWORD",
+    "ssid": "ARRIS-7CF1",
+    "password": "2B71DEB733A61D61",
     "device_key": "123e4567-e89b-12d3-a456-426614174000",
     "device_name": "SmartGarden",
 
     "udpPort": 6000,
-    "delayTimeMs": 50000
+    "udpDelayTimeMs": 50000
 }

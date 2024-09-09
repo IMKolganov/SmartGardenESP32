@@ -5,7 +5,7 @@
 #include <WiFi.h>
 #include <WiFiUdp.h>
 
-void initializeUDPBroadcastModule();
+void initializeUDPBroadcastModule(const int udpPort, const int delayTimeMs);
 
 void udpTask(void *pvParameters);
 

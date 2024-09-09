@@ -1,10 +1,7 @@
 #include <WiFi.h>
 #include "wifi_setup.h"
 
-const char* ssid = "Your_SSID";
-const char* password = "Your_PASSWORD";
-
-void setupWiFi() {
+void setupWiFi(const char* ssid, const char* password) {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {

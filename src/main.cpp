@@ -1,11 +1,8 @@
 #include <Arduino.h>
-#include <WiFi.h>
-#include <WiFiUdp.h>
 #include <ESPAsyncWebServer.h>
 #include <DHT.h>
 #include <ArduinoJson.h>
 #include <ESPmDNS.h>
-#include <WiFiUdp.h>
 #include <ArduinoOTA.h>
 
 #include "config.h"
@@ -19,12 +16,9 @@
 // Server settings
 AsyncWebServer server(80);
 
-WiFiUDP udp;
-const int udpPort = 6000;
-const IPAddress broadcastIP = ~WiFi.subnetMask() | WiFi.gatewayIP();
+const char* filename = "/config.json";
 
 // Hardcoded GUID
-const char* GUID = "123e4567-e89b-12d3-a456-426614174000";
 
 // Define pumps
 Pump pumps[] = {
@@ -36,10 +30,10 @@ void initializeModule() {
     Serial.begin(115200);
     Serial.println("Booting");
 
-    
+    Config config = readFromConfigFile(filename);
 
     // Initialize Wi-Fi
-    readFromConfigFile("/config.json");
+    setupWiFi(config.ssid.c_str(), config.password.c_str());
 
     // Initialize DHT sensor
     setupSensors();
@@ -54,7 +48,7 @@ void initializeModule() {
     setupMQTT();
 
     // Create a task for UDP Broadcast
-    initializeUDPBroadcastModule();
+    initializeUDPBroadcastModule(config.udpPort, config.udpDelayTimeMs);
 
     // Health check endpoint
     server.on("/healthcheck", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -63,31 +57,16 @@ void initializeModule() {
 
     // Endpoint to return hardcoded GUID
     server.on("/guid", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(200, "application/json", "{\"guid\":\"" + String(GUID) + "\"}");
+        request->send(200, "application/json", "{\"guid\":\"" + String("GUID") + "\"}");
     });
 
         // Endpoint to return hardcoded GUID
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-        request->send(200, "application/json", "{\"guid\":\"" + String(GUID) + "\"}");
+        request->send(200, "application/json", "{\"guid\":\"" + String("GUID") + "\"}");
     });
 
     server.begin();
     Serial.println("HTTP server started");
-}
-
-void udpTask(void *pvParameters) {
-    while (true) {
-        IPAddress ip = WiFi.localIP();
-        String ipString = ip.toString();
-
-        udp.beginPacket(broadcastIP, udpPort);
-        udp.print(ipString);
-        udp.endPacket();
-
-        Serial.println("Sent IP address via Broadcast: " + ipString);
-
-        vTaskDelay(50000 / portTICK_PERIOD_MS);
-    }
 }
 
 void runModule() {

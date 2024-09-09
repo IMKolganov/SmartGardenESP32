@@ -1,13 +1,7 @@
 #include <ArduinoJson.h>
 #include <FS.h>
 #include <SPIFFS.h>
-
-struct Config {
-  String ssid;
-  String password;
-  String device_key;
-  String device_name;
-};
+#include <config.h>
 
 Config config;
 
@@ -18,7 +12,7 @@ bool loadConfig(const char* filename, Config &config) {
     return false;
   }
 
-  StaticJsonDocument<512> doc;
+  JsonDocument doc;
 
   DeserializationError error = deserializeJson(doc, file);
   if (error) {
@@ -36,18 +30,22 @@ bool loadConfig(const char* filename, Config &config) {
   return true;
 }
 
-void readFromConfigFile(const char* filename) {
-  Serial.begin(115200);
+Config readFromConfigFile(const char* filename) {
+  Config config;
 
+  // Монтируем файловую систему SPIFFS
   if (!SPIFFS.begin(true)) {
     Serial.println("Не удалось смонтировать файловую систему.");
-    return;
+    return config; // Вернём пустую конфигурацию
   }
 
+  // Загружаем настройки из файла
   if (loadConfig(filename, config)) {
     Serial.println("Настройки успешно загружены.");
     Serial.println("SSID: " + config.ssid);
   } else {
     Serial.println("Ошибка при загрузке настроек.");
   }
+
+  return config; // Возвращаем загруженную конфигурацию
 }
