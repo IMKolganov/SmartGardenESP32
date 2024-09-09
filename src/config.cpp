@@ -8,18 +8,25 @@ Config config;
 bool loadConfig(const char* filename, Config &config) {
   File file = SPIFFS.open(filename, "r");
   if (!file) {
-    Serial.println("Не удалось открыть файл для чтения.");
+    Serial.println("Failed to open file for reading.");
     return false;
+  }else{
+    
+    Serial.print("File is opened. Size: ");
+    Serial.print(file.size());
+    Serial.print(" FileName: ");
+    Serial.println(file.name());
   }
 
-  JsonDocument doc;
+DynamicJsonDocument doc(1024); // Adjust the size as needed
 
-  DeserializationError error = deserializeJson(doc, file);
-  if (error) {
-    Serial.println("Ошибка при чтении JSON файла.");
+DeserializationError error = deserializeJson(doc, file);
+if (error) {
+    Serial.print("Error reading JSON file: ");
+    Serial.println(error.c_str()); // Print the specific error message
     file.close();
     return false;
-  }
+}
 
   config.ssid = doc["ssid"].as<String>();
   config.password = doc["password"].as<String>();
@@ -33,19 +40,18 @@ bool loadConfig(const char* filename, Config &config) {
 Config readFromConfigFile(const char* filename) {
   Config config;
 
-  // Монтируем файловую систему SPIFFS
   if (!SPIFFS.begin(true)) {
-    Serial.println("Не удалось смонтировать файловую систему.");
-    return config; // Вернём пустую конфигурацию
+    Serial.println("Failed to mount file system.");
+    return config;
   }
 
-  // Загружаем настройки из файла
+  // Load settings from file
   if (loadConfig(filename, config)) {
-    Serial.println("Настройки успешно загружены.");
+    Serial.println("Settings successfully loaded.");
     Serial.println("SSID: " + config.ssid);
   } else {
-    Serial.println("Ошибка при загрузке настроек.");
+    Serial.println("Error loading settings.");
   }
 
-  return config; // Возвращаем загруженную конфигурацию
+  return config;
 }

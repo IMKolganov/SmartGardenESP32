@@ -20,7 +20,6 @@ IPAddress calculateBroadcastIP() {
 }
 
 void initializeUDPBroadcastModule(const int udpPort, const int delayTimeMs) {
-    Serial.begin(115200);
     Serial.println("Booting");
 
     UDPParams *udpParams = new UDPParams;
