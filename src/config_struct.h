@@ -19,6 +19,13 @@ struct Config {
   int pumpPin2;
 
   Pump pumps[2];
+
+  String mqttServer;
+  int mqttPort;
+  String mqttUser;
+  String mqttPassword;
+
+  String otaPassword;
 };
 
 #endif // CONFIG_STRUCT_H

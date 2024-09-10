@@ -28,10 +28,10 @@ void initializeModule() {
     setupSensors(&config);
 
     // Initialize OTA
-    setupOTA();
+    setupOTA(config.otaPassword.c_str());
 
     // Initialize MQTT
-    setupMQTT();
+    setupMQTT(&config);
 
     // Create a task for UDP Broadcast
     initializeUDPBroadcastModule(config.udpPort, config.udpDelayTimeMs);

@@ -19,7 +19,7 @@ bool loadConfig(const char* filename, Config &config) {
     Serial.println(file.name());
   }
 
-DynamicJsonDocument doc(1024); // Adjust the size as needed
+JsonDocument doc; // Adjust the size as needed
 
 DeserializationError error = deserializeJson(doc, file);
 if (error) {

@@ -18,5 +18,12 @@
             "lastStartTime": 0,
             "isRunning": false
         }
-    ]
+    ],
+
+    "mqttServer": "192.168.10.18",
+    "mqttPort": 1883,
+    "mqttUser": "guest",
+    "mqttPassword": "guest",
+
+    "otaPassword": "SmartGarden"
 }

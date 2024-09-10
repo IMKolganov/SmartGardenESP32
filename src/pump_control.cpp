@@ -36,7 +36,6 @@ bool startPump(Pump* pump) {
     return false;
 }
 
-
 void stopPump(Pump* pump) {
     digitalWrite(pump->pin, LOW); // Turn off the pump
     pump->isRunning = false;

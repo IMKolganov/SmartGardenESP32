@@ -2,26 +2,19 @@
 #include <PubSubClient.h>
 #include "mqtt_setup.h"
 #include "pump_control.h"
+#include "sensors.h"
 
-// MQTT settings
-const char* mqttServer = "192.168.10.18";
-const int mqttPort = 1883;
-const char* mqttUser = "guest";
-const char* mqttPassword = "guest";
 
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 
-extern Pump pumps[];
-// Pump *pumps;
-
-void setupMQTT() {
-    mqttClient.setServer(mqttServer, mqttPort);
+void setupMQTT(Config *config) {
+    mqttClient.setServer(config->mqttServer.c_str(), config->mqttPort);
     mqttClient.setCallback(mqttCallback);
 
     while (!mqttClient.connected()) {
         Serial.print("Connecting to MQTT...");
-        if (mqttClient.connect("ESP32Client", mqttUser, mqttPassword)) {
+        if (mqttClient.connect("ESP32Client", config->mqttUser.c_str(), config->mqttPassword.c_str())) {
             Serial.println("connected");
             mqttClient.subscribe("pump/control");
         } else {
@@ -53,7 +46,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
         Serial.println(pumpId);
 
         if (pumpId >= 0 && pumpId < 2) {
-            if (startPump(&pumps[pumpId])) {
+            if (startPump(&pumps_g[pumpId])) {
                 Serial.print("Pump ");
                 Serial.print(pumpId);
                 Serial.println(" started successfully.");
