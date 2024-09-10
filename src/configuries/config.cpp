@@ -33,7 +33,10 @@ if (error) {
   config.password = doc["password"].as<String>();
   config.deviceKey = doc["deviceKey"].as<String>();
   config.deviceName = doc["deviceName"].as<String>();
-
+  config.udpPort = doc["udpPort"].as<int>();
+  config.udpDelayTimeMs = doc["udpDelayTimeMs"].as<int>();
+  config.webServerPort = doc["webServerPort"].as<int>();
+  
   // Load pumps from the JSON array
   JsonArray pumpsArray = doc["pumps"].as<JsonArray>();
   int i = 0;
@@ -44,6 +47,13 @@ if (error) {
     config.pumps[i].isRunning = pumpObj["isRunning"].as<bool>();
     i++;
   }
+
+  config.mqttServer = doc["mqttServer"].as<String>();
+  config.mqttPort = doc["mqttPort"].as<int>();
+  config.mqttUser = doc["mqttUser"].as<String>();
+  config.mqttPassword = doc["mqttPassword"].as<String>();
+
+  config.otaPassword = doc["otaPassword"].as<String>();
 
   file.close();
   return true;

@@ -13,12 +13,15 @@ void setupMQTT(Config *config) {
     mqttClient.setCallback(mqttCallback);
 
     while (!mqttClient.connected()) {
-        Serial.print("Connecting to MQTT...");
+        Serial.print("Connecting to MQTT... IP: ");
+        Serial.print(config->mqttServer);
+        Serial.print(" Port: ");
+        Serial.print(config->mqttPort);
         if (mqttClient.connect("ESP32Client", config->mqttUser.c_str(), config->mqttPassword.c_str())) {
             Serial.println("connected");
             mqttClient.subscribe("pump/control");
         } else {
-            Serial.print("failed, rc=");
+            Serial.print(" failed, rc=");
             Serial.print(mqttClient.state());
             Serial.println(" try again in 5 seconds");
             delay(5000);

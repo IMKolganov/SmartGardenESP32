@@ -6,7 +6,6 @@
     "udpPort": 6000,
     "udpDelayTimeMs": 50000,
     "webServerPort": 80,
-
     "pumps": [
         {
             "pin": 2,
@@ -19,11 +18,9 @@
             "isRunning": false
         }
     ],
-
     "mqttServer": "192.168.10.18",
     "mqttPort": 1883,
     "mqttUser": "guest",
     "mqttPassword": "guest",
-
     "otaPassword": "SmartGarden"
 }

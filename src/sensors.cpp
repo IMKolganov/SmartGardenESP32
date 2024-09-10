@@ -13,6 +13,7 @@ void setupSensors(Config *config) {
   dht.begin();
 
   pumps_g = new Pump[2];  // Allocate memory for the pumps
+  Serial.println("Started setup pumps...");
   for (int i = 0; i < 2; i++) {
       pumps_g[i] = config->pumps[i];  // Load pumps from config
       Serial.printf("Pump %d: Pin=%d, Last Start Time=%lu, Is Running=%s\n", 

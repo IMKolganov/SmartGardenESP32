@@ -15,9 +15,6 @@ struct Config {
 
   int webServerPort;
 
-  int pumpPin1;
-  int pumpPin2;
-
   Pump pumps[2];
 
   String mqttServer;

@@ -2,6 +2,8 @@
 #include "ota_setup.h"
 
 void setupOTA(const char* otaPassword) {
+  Serial.println("OTA started setup...");
+
   ArduinoOTA
     .onStart([]() {
       String type;
