@@ -12,8 +12,8 @@ const char* mqttPassword = "guest";
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
 
-// Определение pumps массива как глобального
 extern Pump pumps[];
+// Pump *pumps;
 
 void setupMQTT() {
     mqttClient.setServer(mqttServer, mqttPort);
@@ -74,3 +74,4 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     }
 }
 
+// void pumpControl()

@@ -1,12 +1,10 @@
 #ifndef SENSORS_H
 #define SENSORS_H
 
+#include <Arduino.h>
 #include <DHT.h>
-#include <ESPAsyncWebServer.h>
+#include "config.h"
 
-void setupSensors();
-void handleTemperatureHumidityRequest(AsyncWebServerRequest *request);
-void handleSoilMoistureRequest(AsyncWebServerRequest *request);
-void handleSerialInput();
+void setupSensors(Config *config);
 
 #endif // SENSORS_H

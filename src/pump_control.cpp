@@ -12,9 +12,8 @@ void setupPumps(Pump* pumps, int numPumps) {
 bool startPump(Pump* pump) {
     unsigned long currentTime = millis();
 
-    // Проверка, можно ли запустить насос (учитывая интервал и статус)
     if (!pump->isRunning && (currentTime - pump->lastStartTime >= minInterval)) {
-        digitalWrite(pump->pin, HIGH); // Включаем насос
+        digitalWrite(pump->pin, HIGH);
         pump->lastStartTime = currentTime;
         pump->isRunning = true;
         Serial.println("Pump started successfully.");

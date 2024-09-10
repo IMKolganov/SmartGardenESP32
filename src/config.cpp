@@ -2,6 +2,7 @@
 #include <FS.h>
 #include <SPIFFS.h>
 #include <config.h>
+#include <pump_struct.h>
 
 Config config;
 
@@ -30,8 +31,19 @@ if (error) {
 
   config.ssid = doc["ssid"].as<String>();
   config.password = doc["password"].as<String>();
-  config.device_key = doc["device_key"].as<String>();
-  config.device_name = doc["device_name"].as<String>();
+  config.deviceKey = doc["deviceKey"].as<String>();
+  config.deviceName = doc["deviceName"].as<String>();
+
+  // Load pumps from the JSON array
+  JsonArray pumpsArray = doc["pumps"].as<JsonArray>();
+  int i = 0;
+  for (JsonObject pumpObj : pumpsArray) {
+    if (i >= 2) break;  // Limit to 2 pumps; adjust if you have more
+    config.pumps[i].pin = pumpObj["pin"].as<int>();
+    config.pumps[i].lastStartTime = pumpObj["lastStartTime"].as<unsigned long>();
+    config.pumps[i].isRunning = pumpObj["isRunning"].as<bool>();
+    i++;
+  }
 
   file.close();
   return true;

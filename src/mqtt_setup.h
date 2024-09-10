@@ -14,9 +14,6 @@ extern const char* mqttPassword;
 extern WiFiClient espClient;
 extern PubSubClient mqttClient;
 
-// Объявление массива pumps
-extern Pump pumps[];  // Глобальный массив pumps
-
 // Прототипы функций
 void setupMQTT();
 void mqttCallback(char* topic, byte* payload, unsigned int length);
