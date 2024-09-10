@@ -1,8 +1,8 @@
 #include <ArduinoJson.h>
 #include <FS.h>
 #include <SPIFFS.h>
-#include <config.h>
-#include <pump_struct.h>
+#include <configuries/config.h>
+#include <struct/pump_struct.h>
 
 Config config;
 

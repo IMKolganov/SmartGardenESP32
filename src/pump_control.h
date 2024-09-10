@@ -2,7 +2,7 @@
 #define PUMP_CONTROL_H
 
 #include <Arduino.h>
-#include "pump_struct.h"
+#include <struct/pump_struct.h>
 
 // Constants
 const unsigned long maxPumpDuration = 30000; // Maximum pump run time (30 seconds)

@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "config_struct.h"
+#include "struct/config_struct.h"
 
 void loadConfig();
 Config readFromConfigFile(const char* filename);

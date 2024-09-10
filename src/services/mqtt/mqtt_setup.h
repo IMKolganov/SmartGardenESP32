@@ -2,7 +2,7 @@
 #define MQTT_SETUP_H
 
 #include <PubSubClient.h>
-#include "config.h"
+#include <configuries/config.h>
 #include "pump_control.h"
 
 // MQTT client
