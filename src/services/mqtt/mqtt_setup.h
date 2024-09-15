@@ -4,8 +4,9 @@
 #include <PubSubClient.h>
 #include <WiFiClient.h>
 #include "configuries/config.h"
-#include "pump_controller.h"
-#include "dht_controller.h"
+#include "services/devices/pump_controller.h"
+#include "services/sensors/dht_controller.h"
+#include "services/sensors/soil_moisture_controller.h"
 
 class MQTTService {
 public:
@@ -13,14 +14,15 @@ public:
 
     PubSubClient mqttClient;
     PumpController pumpController;
-    DhtController dhtController;
 
     void setupMQTT(Config *config);
 
     void sendLog(const String& message);
 
 private:
-    WiFiClient espClient;    
+    WiFiClient espClient;
+    DhtController dhtController;
+    SoilMoistureController soilMoistureController;
 
     // Static callback function
     static void mqttCallback(char* topic, byte* payload, unsigned int length);

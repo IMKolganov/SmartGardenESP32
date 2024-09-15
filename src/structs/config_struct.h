@@ -50,9 +50,9 @@ struct Config {
     doc["webServerPort"] = webServerPort;
 
     // Serialize Pump array
-    JsonArray pumpsArray = doc.createNestedArray("pumps");
+    JsonArray pumpsArray = doc["pumps"].to<JsonArray>();
     for (int i = 0; i < 2; i++) {
-      JsonObject pumpObj = pumpsArray.createNestedObject();
+      JsonObject pumpObj = pumpsArray.add<JsonObject>();
       pumpObj["pin"] = pumps[i].pin;
       pumpObj["lastStartTime"] = pumps[i].lastStartTime;
       pumpObj["isRunning"] = pumps[i].isRunning;

@@ -1,8 +1,9 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include "mqtt_setup.h"
-#include "pump_controller.h"
-#include "dht_controller.h"
+#include "services/devices/pump_controller.h"
+#include "services/sensors/dht_controller.h"
+#include "services/sensors/soil_moisture_controller.h"
 
 // Initialize the global instance
 MQTTService mqttServiceInstance;
@@ -16,6 +17,7 @@ void MQTTService::setupMQTT(Config *config) {
 
     pumpController.setupPump(config);//todo: move from here
     dhtController.setupDht(config);
+    soilMoistureController.setupSoilMoisture(config);
 
     while (!mqttClient.connected()) {
         Serial.print("Connecting to MQTT... IP: ");
@@ -26,6 +28,8 @@ void MQTTService::setupMQTT(Config *config) {
             Serial.println(" connected");
             mqttClient.subscribe("control/pump/#");
             mqttClient.subscribe("control/dht/");
+            mqttClient.subscribe("control/soil-moisture/");
+            
             mqttClient.subscribe("status/esp32/smartgarden/");
         } else {
             Serial.print(" failed, rc=");
@@ -82,7 +86,15 @@ void MQTTService::processMessage(char* topic, byte* payload, unsigned int length
         jsonResponse = dhtStatus.toJson();
         Serial.println(jsonResponse.c_str());
         sendMessage(statusTopic.c_str(), jsonResponse.c_str());
-    } 
+    }
+    else if (topicStr.startsWith("control/soil-moisture/")) {
+        SoilMoistureStatus soilMoistureStatus = mqttServiceInstance.soilMoistureController.handleControlMessage(message);
+        statusTopic = "status/soil-moisture/";
+        Serial.print("Soil moisture status: ");
+        jsonResponse = soilMoistureStatus.toJson();
+        Serial.println(jsonResponse.c_str());
+        sendMessage(statusTopic.c_str(), jsonResponse.c_str());
+    }
     else {
         Serial.println("Unknown topic: " + topicStr);
     }
