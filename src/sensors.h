@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <DHT.h>
 #include <configuries/config.h>
-#include <struct/pump_struct.h>
+#include <structs/pump_struct.h>
 
 extern Pump* pumps_g;  // Declare pumps_g as external so it can be accessed in other files
 

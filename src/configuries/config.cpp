@@ -2,7 +2,7 @@
 #include <FS.h>
 #include <SPIFFS.h>
 #include <configuries/config.h>
-#include <struct/pump_struct.h>
+#include <structs/pump_struct.h>
 
 Config config;
 
@@ -47,6 +47,8 @@ if (error) {
     config.pumps[i].isRunning = pumpObj["isRunning"].as<bool>();
     i++;
   }
+  config.pumpMaxPumpDuration = doc["pumpMaxPumpDuration"].as<int>();
+  config.pumpMinInterval = doc["pumpMinInterval"].as<int>();
 
   config.mqttServer = doc["mqttServer"].as<String>();
   config.mqttPort = doc["mqttPort"].as<int>();

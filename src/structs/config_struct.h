@@ -16,6 +16,8 @@ struct Config {
   int webServerPort;
 
   Pump pumps[2];
+  int pumpMaxPumpDuration;
+  int pumpMinInterval;
 
   String mqttServer;
   int mqttPort;

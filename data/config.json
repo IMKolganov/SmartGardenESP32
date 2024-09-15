@@ -18,7 +18,9 @@
             "isRunning": false
         }
     ],
-    "mqttServer": "192.168.10.18",
+    "pumpMaxPumpDuration": 30000,
+    "pumpMinInterval": 60000,
+    "mqttServer": "192.168.0.3",
     "mqttPort": 1883,
     "mqttUser": "guest",
     "mqttPassword": "guest",

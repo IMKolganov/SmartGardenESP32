@@ -2,16 +2,34 @@
 #define PUMP_CONTROL_H
 
 #include <Arduino.h>
-#include <struct/pump_struct.h>
+#include <configuries/config.h>
+#include <structs/pump_status.h>
 
-// Constants
-const unsigned long maxPumpDuration = 30000; // Maximum pump run time (30 seconds)
-const unsigned long minInterval = 60000;    // Minimum interval between runs (600000 = 10 minutes)
+class PumpController {
+public:
+    // Constructor
+    PumpController();
 
-// Function prototypes
-void setupPumps(Pump* pumps, int numPumps);
-bool startPump(Pump* pump);
-void stopPump(Pump* pump);
-void updatePump(Pump* pump);
+    // Methods for pump control
+    void setupPump(Config *config); // Initialize the pump
+    bool startPump(int pumpId, int minInterval); // Start the pump with a minimum interval
+    void stopPump(int pumpId); // Stop the pump
+    void updatePump(int pumpId); // Update the pump state based on duration
+    void updateAllPumps();
+
+    // Method to handle MQTT control messages
+    PumpStatus handleControlMessage(int pumpId, String message);
+
+    // Getter methods
+    bool isRunning() const;
+    unsigned long getLastStartTime() const;
+
+    void setPumps(Pump* pumps, int numPumps);
+
+private:
+    Pump pumps[2];
+
+    int maxPumpDuration;
+};
 
 #endif // PUMP_CONTROL_H

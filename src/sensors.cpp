@@ -20,7 +20,7 @@ void setupSensors(Config *config) {
                     i + 1, pumps_g[i].pin, pumps_g[i].lastStartTime, pumps_g[i].isRunning ? "true" : "false");
   }
   
-  setupPumps(pumps_g, 2);  // Initialize pumps
+  // setupPumps(pumps_g, 2);  // Initialize pumps
 }
 
   // float temperature = dht.readTemperature();

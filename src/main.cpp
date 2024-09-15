@@ -4,12 +4,12 @@
 #include <ArduinoOTA.h>
 
 #include <configuries/config.h>
-#include "services/wifi/wifi_setup.h"
-#include "services/ota/ota_setup.h"
-#include "sensors.h"
-#include "services/mqtt/mqtt_setup.h"
-#include "services/broadcast/udp_module.h"
-#include "services/webserver/web_server_request_setup.h"
+#include <services/wifi/wifi_setup.h>
+#include <services/ota/ota_setup.h>
+#include <sensors.h>
+#include <services/mqtt/mqtt_setup.h>
+#include <services/broadcast/udp_module.h>
+#include <services/webserver/web_server_request_setup.h>
 
 const char* filename = "/config.json";
 
@@ -25,13 +25,14 @@ void initializeModule() {
     // Initialize web server
     setupWebServerRequestsSetup(config.webServerPort, config.deviceName.c_str(), config.deviceKey.c_str());
 
-    setupSensors(&config);
+    // setupSensors(&config);
 
     // Initialize OTA
     setupOTA(config.otaPassword.c_str());
 
     // Initialize MQTT
-    setupMQTT(&config);
+    mqttServiceInstance.setupMQTT(&config);
+
 
     // Create a task for UDP Broadcast
     initializeUDPBroadcastModule(config.udpPort, config.udpDelayTimeMs);
@@ -41,5 +42,6 @@ void initializeModule() {
 
 void runModule() {
     ArduinoOTA.handle();
-    mqttClient.loop();
+    mqttServiceInstance.mqttClient.loop();
+    mqttServiceInstance.pumpController.updateAllPumps();
 }

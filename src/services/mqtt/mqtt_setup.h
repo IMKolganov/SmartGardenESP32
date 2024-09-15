@@ -5,11 +5,25 @@
 #include <configuries/config.h>
 #include "pump_control.h"
 
-// MQTT client
-extern WiFiClient espClient;
-extern PubSubClient mqttClient;
+class MQTTService {
+public:
+    MQTTService();
 
-void setupMQTT(Config *config);
-void mqttCallback(char* topic, byte* payload, unsigned int length);
+    PubSubClient mqttClient;
+    PumpController pumpController;
 
-#endif
+    void setupMQTT(Config *config);
+
+private:
+    WiFiClient espClient;    
+
+    // Static callback function
+    static void mqttCallback(char* topic, byte* payload, unsigned int length);
+
+    // Method to call from static callback
+    void processMessage(char* topic, byte* payload, unsigned int length);
+};
+
+extern MQTTService mqttServiceInstance;  // Declare the global instance
+
+#endif // MQTT_SETUP_H
