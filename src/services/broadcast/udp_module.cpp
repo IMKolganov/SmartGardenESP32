@@ -1,5 +1,6 @@
 // udp_module.cpp
 #include "udp_module.h"
+#include "services/mqtt/mqtt_setup.h"
 
 WiFiUDP udp;
 
@@ -51,6 +52,7 @@ void udpTask(void *pvParameters) {
         udp.endPacket();
 
         Serial.println("Sent IP address via Broadcast: " + ipString);
+        mqttServiceInstance.sendLog("Sent IP address via Broadcast: " + ipString);
 
         vTaskDelay(params->delayTimeMs / portTICK_PERIOD_MS);
     }

@@ -2,6 +2,7 @@
 #define MQTT_SETUP_H
 
 #include <PubSubClient.h>
+#include <WiFiClient.h>
 #include "configuries/config.h"
 #include "pump_controller.h"
 #include "dht_controller.h"
@@ -16,6 +17,8 @@ public:
 
     void setupMQTT(Config *config);
 
+    void sendLog(const String& message);
+
 private:
     WiFiClient espClient;    
 
@@ -24,6 +27,8 @@ private:
 
     // Method to call from static callback
     void processMessage(char* topic, byte* payload, unsigned int length);
+
+    void sendMessage(const String& topic, const String& message);
 };
 
 extern MQTTService mqttServiceInstance;  // Declare the global instance

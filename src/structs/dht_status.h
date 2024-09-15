@@ -11,8 +11,7 @@ struct DhtStatus {
     String errorMessage;
 
     String toJson() const {
-        // Create a JsonDocument with a suitable size
-        JsonDocument doc; // Adjust the size as needed
+        JsonDocument doc;
 
         // Populate the JsonDocument
         doc["success"] = success;

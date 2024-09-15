@@ -6,7 +6,6 @@
 #include "configuries/config.h"
 #include "services/wifi/wifi_setup.h"
 #include "services/ota/ota_setup.h"
-#include "sensors.h"
 #include "services/mqtt/mqtt_setup.h"
 #include "services/broadcast/udp_module.h"
 #include "services/webserver/web_server_request_setup.h"
@@ -31,11 +30,12 @@ void initializeModule() {
     // Initialize MQTT
     mqttServiceInstance.setupMQTT(&config);
 
-
     // Create a task for UDP Broadcast
     initializeUDPBroadcastModule(config.udpPort, config.udpDelayTimeMs);
 
     Serial.println("HTTP server started");
+    mqttServiceInstance.sendLog("HTTP server started");
+    // mqttServiceInstance.sendLog(config.toJson());
 }
 
 void runModule() {

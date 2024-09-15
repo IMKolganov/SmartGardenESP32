@@ -25,7 +25,8 @@ void MQTTService::setupMQTT(Config *config) {
         if (mqttClient.connect("ESP32Client", config->mqttUser.c_str(), config->mqttPassword.c_str())) {
             Serial.println(" connected");
             mqttClient.subscribe("control/pump/#");
-            mqttClient.subscribe("control/sensor/#");
+            mqttClient.subscribe("control/dht/");
+            mqttClient.subscribe("status/esp32/smartgarden/");
         } else {
             Serial.print(" failed, rc=");
             Serial.print(mqttClient.state());
@@ -35,6 +36,11 @@ void MQTTService::setupMQTT(Config *config) {
             delay(config->mqttTryAgain);
         }
     }
+}
+
+void MQTTService::sendMessage(const String& topic, const String& message) {
+    // Publish the message to the specified topic
+    mqttClient.publish(topic.c_str(), message.c_str());
 }
 
 // Static callback function
@@ -58,22 +64,33 @@ void MQTTService::processMessage(char* topic, byte* payload, unsigned int length
     String topicStr = String(topic);
     String statusTopic = "";
 
+    String jsonResponse = "";
+
     if (topicStr.startsWith("control/pump/")) {
         int pumpId = topicStr.substring(String("control/pump/").length()).toInt();
         String statusTopic = "status/pump/" + String(pumpId);
-        PumpStatus status = mqttServiceInstance.pumpController.handleControlMessage(pumpId, message);
+        PumpStatus pumpStatus = mqttServiceInstance.pumpController.handleControlMessage(pumpId, message);
         Serial.print("Pump status: ");
-        Serial.println(status.message);
-        mqttClient.publish(statusTopic.c_str(), status.message.c_str());
+        jsonResponse = pumpStatus.toJson();
+        Serial.println(jsonResponse.c_str());
+        sendMessage(statusTopic.c_str(), jsonResponse.c_str());
     } 
     else if (topicStr.startsWith("control/dht/")) {
-        DhtStatus status = mqttServiceInstance.dhtController.handleControlMessage(message);
+        DhtStatus dhtStatus = mqttServiceInstance.dhtController.handleControlMessage(message);
         statusTopic = "status/dht/";
         Serial.print("Dht status: ");
-        String payload = status.toJson();
-        mqttClient.publish(statusTopic.c_str(), payload.c_str());
+        jsonResponse = dhtStatus.toJson();
+        Serial.println(jsonResponse.c_str());
+        sendMessage(statusTopic.c_str(), jsonResponse.c_str());
     } 
     else {
         Serial.println("Unknown topic: " + topicStr);
     }
+}
+
+
+void MQTTService::sendLog(const String& message) {
+    String topic = "status/esp32/smartgarden/";    
+    // Publish the message to the specified topic
+    mqttClient.publish(topic.c_str(), message.c_str());
 }

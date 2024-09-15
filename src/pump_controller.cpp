@@ -1,6 +1,7 @@
 #include "pump_controller.h"
 #include "configuries/config.h"
 #include "structs/pump_status.h"
+#include "services/mqtt/mqtt_setup.h"
 
 PumpController::PumpController() {}
 
@@ -73,6 +74,7 @@ void PumpController::updatePump(int pumpId) {
         Serial.print(" maxPumpDuration: ");
         Serial.println(maxPumpDuration);
         Serial.println("Pump stopped automatically due to max duration.");
+        mqttServiceInstance.sendLog("Pump stopped automatically due to max duration.");
     }
 }
 
