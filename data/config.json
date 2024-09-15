@@ -24,5 +24,11 @@
     "mqttPort": 1883,
     "mqttUser": "guest",
     "mqttPassword": "guest",
-    "otaPassword": "SmartGarden"
+    "mqttTryAgain": 5000,
+    "otaPassword": "SmartGarden",
+
+    "dhtPin": 4,
+    "dhtType": 11,
+
+    "soilSensorPin": 34
 }

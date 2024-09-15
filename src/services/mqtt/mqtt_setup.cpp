@@ -1,19 +1,21 @@
 #include <WiFi.h>
 #include <PubSubClient.h>
 #include "mqtt_setup.h"
-#include "pump_control.h"
+#include "pump_controller.h"
+#include "dht_controller.h"
 
 // Initialize the global instance
 MQTTService mqttServiceInstance;
 
-MQTTService::MQTTService() : mqttClient(espClient), pumpController() {
+MQTTService::MQTTService() : mqttClient(espClient), pumpController(), dhtController() {
 }
 
 void MQTTService::setupMQTT(Config *config) {
     mqttClient.setServer(config->mqttServer.c_str(), config->mqttPort);
     mqttClient.setCallback(mqttCallback);
 
-    pumpController.setupPump(config);
+    pumpController.setupPump(config);//todo: move from here
+    dhtController.setupDht(config);
 
     while (!mqttClient.connected()) {
         Serial.print("Connecting to MQTT... IP: ");
@@ -27,8 +29,10 @@ void MQTTService::setupMQTT(Config *config) {
         } else {
             Serial.print(" failed, rc=");
             Serial.print(mqttClient.state());
-            Serial.println(" try again in 5 seconds");
-            delay(5000);
+            Serial.print(" try again in ");
+            Serial.print(config->mqttTryAgain);
+            Serial.println(" miliseconds");
+            delay(config->mqttTryAgain);
         }
     }
 }
@@ -52,6 +56,7 @@ void MQTTService::processMessage(char* topic, byte* payload, unsigned int length
     Serial.println(message);
 
     String topicStr = String(topic);
+    String statusTopic = "";
 
     if (topicStr.startsWith("control/pump/")) {
         int pumpId = topicStr.substring(String("control/pump/").length()).toInt();
@@ -61,9 +66,12 @@ void MQTTService::processMessage(char* topic, byte* payload, unsigned int length
         Serial.println(status.message);
         mqttClient.publish(statusTopic.c_str(), status.message.c_str());
     } 
-    else if (topicStr.startsWith("control/sensor/")) {
-        // Handle sensor control
-        // mqttServiceInstance.handleSensorControl(topicStr, message);
+    else if (topicStr.startsWith("control/dht/")) {
+        DhtStatus status = mqttServiceInstance.dhtController.handleControlMessage(message);
+        statusTopic = "status/dht/";
+        Serial.print("Dht status: ");
+        String payload = status.toJson();
+        mqttClient.publish(statusTopic.c_str(), payload.c_str());
     } 
     else {
         Serial.println("Unknown topic: " + topicStr);

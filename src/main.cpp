@@ -3,13 +3,13 @@
 #include <ESPmDNS.h>
 #include <ArduinoOTA.h>
 
-#include <configuries/config.h>
-#include <services/wifi/wifi_setup.h>
-#include <services/ota/ota_setup.h>
-#include <sensors.h>
-#include <services/mqtt/mqtt_setup.h>
-#include <services/broadcast/udp_module.h>
-#include <services/webserver/web_server_request_setup.h>
+#include "configuries/config.h"
+#include "services/wifi/wifi_setup.h"
+#include "services/ota/ota_setup.h"
+#include "sensors.h"
+#include "services/mqtt/mqtt_setup.h"
+#include "services/broadcast/udp_module.h"
+#include "services/webserver/web_server_request_setup.h"
 
 const char* filename = "/config.json";
 
@@ -24,8 +24,6 @@ void initializeModule() {
 
     // Initialize web server
     setupWebServerRequestsSetup(config.webServerPort, config.deviceName.c_str(), config.deviceKey.c_str());
-
-    // setupSensors(&config);
 
     // Initialize OTA
     setupOTA(config.otaPassword.c_str());

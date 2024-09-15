@@ -54,9 +54,15 @@ if (error) {
   config.mqttPort = doc["mqttPort"].as<int>();
   config.mqttUser = doc["mqttUser"].as<String>();
   config.mqttPassword = doc["mqttPassword"].as<String>();
+  config.mqttTryAgain = doc["mqttTryAgain"].as<int>();
 
   config.otaPassword = doc["otaPassword"].as<String>();
 
+  config.dhtPin = doc["dhtPin"].as<int>();
+  config.dhtType = doc["dhtType"].as<int>();
+
+  config.soilSensorPin = doc["soilSensorPin"].as<int>();
+  
   file.close();
   return true;
 }

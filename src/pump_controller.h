@@ -1,9 +1,9 @@
-#ifndef PUMP_CONTROL_H
-#define PUMP_CONTROL_H
+#ifndef PUMP_CONTROLLER_H
+#define PUMP_CONTROLLER_H
 
 #include <Arduino.h>
-#include <configuries/config.h>
-#include <structs/pump_status.h>
+#include "configuries/config.h"
+#include "structs/pump_status.h"
 
 class PumpController {
 public:
@@ -32,4 +32,4 @@ private:
     int maxPumpDuration;
 };
 
-#endif // PUMP_CONTROL_H
+#endif // PUMP_CONTROLLER_H

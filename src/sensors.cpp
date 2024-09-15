@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include "sensors.h"
-#include "pump_control.h"
+#include "pump_controller.h"
 
 #define DHTPIN 4           // Pin connected to the DHT22
 #define DHTTYPE DHT11      // Type of DHT sensor

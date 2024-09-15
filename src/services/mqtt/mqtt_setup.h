@@ -2,8 +2,9 @@
 #define MQTT_SETUP_H
 
 #include <PubSubClient.h>
-#include <configuries/config.h>
-#include "pump_control.h"
+#include "configuries/config.h"
+#include "pump_controller.h"
+#include "dht_controller.h"
 
 class MQTTService {
 public:
@@ -11,6 +12,7 @@ public:
 
     PubSubClient mqttClient;
     PumpController pumpController;
+    DhtController dhtController;
 
     void setupMQTT(Config *config);
 

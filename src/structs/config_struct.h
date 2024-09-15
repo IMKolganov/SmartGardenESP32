@@ -23,8 +23,14 @@ struct Config {
   int mqttPort;
   String mqttUser;
   String mqttPassword;
+  int mqttTryAgain;
 
   String otaPassword;
+
+  int dhtPin;
+  int dhtType;
+
+  int soilSensorPin;
 };
 
 #endif // CONFIG_STRUCT_H
