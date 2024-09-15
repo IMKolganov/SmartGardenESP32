@@ -1,0 +1,34 @@
+{
+    "ssid": "ARRIS-7CF1",
+    "password": "2B71DEB733A61D61",
+    "deviceKey": "123e4567-e89b-12d3-a456-426614174000",
+    "deviceName": "SmartGarden",
+    "udpPort": 6000,
+    "udpDelayTimeMs": 50000,
+    "webServerPort": 80,
+    "pumps": [
+        {
+            "pin": 2,
+            "lastStartTime": 0,
+            "isRunning": false
+        },
+        {
+            "pin": 3,
+            "lastStartTime": 0,
+            "isRunning": false
+        }
+    ],
+    "pumpMaxPumpDuration": 30000,
+    "pumpMinInterval": 60000,
+    "mqttServer": "192.168.0.3",
+    "mqttPort": 1883,
+    "mqttUser": "guest",
+    "mqttPassword": "guest",
+    "mqttTryAgain": 5000,
+    "otaPassword": "SmartGarden",
+
+    "dhtPin": 4,
+    "dhtType": 11,
+
+    "soilSensorPin": 34
+}

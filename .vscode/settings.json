@@ -1,0 +1,8 @@
+{
+    "C_Cpp.errorSquiggles": "disabled",
+    "files.associations": {
+        "new": "cpp",
+        "string": "cpp",
+        "system_error": "cpp"
+    }
+}

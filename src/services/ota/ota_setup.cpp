@@ -1,9 +1,9 @@
 #include <ArduinoOTA.h>
 #include "ota_setup.h"
 
-const char* otaPassword = "SmartGarden";
+void setupOTA(const char* otaPassword) {
+  Serial.println("OTA started setup...");
 
-void setupOTA() {
   ArduinoOTA
     .onStart([]() {
       String type;
@@ -29,7 +29,6 @@ void setupOTA() {
       else if (error == OTA_END_ERROR) Serial.println("End Failed");
     });
 
-  // Установите пароль для OTA
   ArduinoOTA.setPassword(otaPassword);
 
   ArduinoOTA.begin();
