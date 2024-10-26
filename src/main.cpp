@@ -40,6 +40,7 @@ void initializeModule() {
 
 void runModule() {
     ArduinoOTA.handle();
-    mqttServiceInstance.mqttClient.loop();
+    mqttServiceInstance.loop();
+    // mqttServiceInstance.mqttClient.loop();
     mqttServiceInstance.pumpController.updateAllPumps();
 }

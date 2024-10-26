@@ -11,18 +11,22 @@
 class MQTTService {
 public:
     MQTTService();
-
-    PubSubClient mqttClient;
     PumpController pumpController;
 
     void setupMQTT(Config *config);
+    void loop();  // Add loop method
 
     void sendLog(const String& message);
 
 private:
+    PubSubClient mqttClient;
     WiFiClient espClient;
+    
     DhtController dhtController;
     SoilMoistureController soilMoistureController;
+
+    Config *config;  // Pointer to store the Config object
+    unsigned long lastReconnectAttempt = 0;
 
     // Static callback function
     static void mqttCallback(char* topic, byte* payload, unsigned int length);
@@ -31,6 +35,7 @@ private:
     void processMessage(char* topic, byte* payload, unsigned int length);
 
     void sendMessage(const String& topic, const String& message);
+    bool connectToMQTT();  // Add connectToMQTT method
 };
 
 extern MQTTService mqttServiceInstance;  // Declare the global instance

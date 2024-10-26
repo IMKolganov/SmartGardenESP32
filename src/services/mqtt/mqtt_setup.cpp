@@ -1,49 +1,70 @@
-#include <WiFi.h>
-#include <PubSubClient.h>
 #include "mqtt_setup.h"
-#include "services/devices/pump_controller.h"
-#include "services/sensors/dht_controller.h"
-#include "services/sensors/soil_moisture_controller.h"
 
 // Initialize the global instance
 MQTTService mqttServiceInstance;
 
-MQTTService::MQTTService() : mqttClient(espClient), pumpController(), dhtController() {
+MQTTService::MQTTService() : mqttClient(espClient), pumpController(), dhtController(), soilMoistureController(), config(nullptr) {
 }
 
 void MQTTService::setupMQTT(Config *config) {
+    this->config = config;  // Store the pointer to the Config object
     mqttClient.setServer(config->mqttServer.c_str(), config->mqttPort);
     mqttClient.setCallback(mqttCallback);
 
-    pumpController.setupPump(config);//todo: move from here
+    pumpController.setupPump(config);
     dhtController.setupDht(config);
     soilMoistureController.setupSoilMoisture(config);
 
-    while (!mqttClient.connected()) {
-        Serial.print("Connecting to MQTT... IP: ");
-        Serial.println(config->mqttServer);
-        Serial.print(" Port: ");
-        Serial.print(config->mqttPort);
-        if (mqttClient.connect("ESP32Client", config->mqttUser.c_str(), config->mqttPassword.c_str())) {
-            Serial.println(" connected");
-            mqttClient.subscribe("control/pump/#");
-            mqttClient.subscribe("control/dht/");
-            mqttClient.subscribe("control/soil-moisture/");
-            
-            mqttClient.subscribe("status/esp32/smartgarden/");
-        } else {
-            Serial.print(" failed, rc=");
-            Serial.print(mqttClient.state());
-            Serial.print(" try again in ");
-            Serial.print(config->mqttTryAgain);
-            Serial.println(" miliseconds");
-            delay(config->mqttTryAgain);
+    if (connectToMQTT()) {
+        Serial.println("Connected to MQTT");
+    } else {
+        Serial.println("Failed to connect to MQTT");
+        delay(10000);
+        ESP.restart();
+    }
+}
+
+bool MQTTService::connectToMQTT() {
+    if (config == nullptr) {
+        Serial.println("Config is not set!");
+        return false;
+    }
+
+    Serial.print("Connecting to MQTT... IP: ");
+    Serial.println(config->mqttServer);
+    Serial.print(" Port: ");
+    Serial.println(config->mqttPort);
+
+    if (mqttClient.connect("ESP32Client", config->mqttUser.c_str(), config->mqttPassword.c_str())) {
+        Serial.println("Connected");
+        mqttClient.subscribe("control/pump/#");
+        mqttClient.subscribe("control/dht/");
+        mqttClient.subscribe("control/soil-moisture/");
+        // mqttClient.subscribe("status/esp32/smartgarden/");
+        return true;
+    } else {
+        Serial.print("Failed, rc=");
+        Serial.print(mqttClient.state());
+        return false;
+    }
+}
+
+void MQTTService::loop() {
+    if (!mqttClient.connected()) {
+        unsigned long now = millis();
+        if (now - lastReconnectAttempt > 5000) { // Attempt to reconnect every 5 seconds
+            lastReconnectAttempt = now;
+            if (connectToMQTT()) {
+                lastReconnectAttempt = 0; // Reset the reconnect attempt time
+            }
         }
+    } else {
+        mqttClient.loop();
     }
 }
 
 void MQTTService::sendMessage(const String& topic, const String& message) {
-    // Publish the message to the specified topic
+//    Serial.println("Sent message to: " + String(topic) + " message: " + String(message));
     mqttClient.publish(topic.c_str(), message.c_str());
 }
 
@@ -67,42 +88,32 @@ void MQTTService::processMessage(char* topic, byte* payload, unsigned int length
 
     String topicStr = String(topic);
     String statusTopic = "";
-
     String jsonResponse = "";
 
     if (topicStr.startsWith("control/pump/")) {
-        int pumpId = topicStr.substring(String("control/pump/").length()).toInt();
-        String statusTopic = "status/pump/" + String(pumpId);
-        PumpStatus pumpStatus = mqttServiceInstance.pumpController.handleControlMessage(pumpId, message);
-        Serial.print("Pump status: ");
+        statusTopic = "status/pump/";
+        PumpStatus pumpStatus = pumpController.handleControlMessage(message);
         jsonResponse = pumpStatus.toJson();
-        Serial.println(jsonResponse.c_str());
-        sendMessage(statusTopic.c_str(), jsonResponse.c_str());
+        sendMessage(statusTopic, jsonResponse);
     } 
     else if (topicStr.startsWith("control/dht/")) {
-        DhtStatus dhtStatus = mqttServiceInstance.dhtController.handleControlMessage(message);
+        DhtStatus dhtStatus = dhtController.handleControlMessage(message);
         statusTopic = "status/dht/";
-        Serial.print("Dht status: ");
         jsonResponse = dhtStatus.toJson();
-        Serial.println(jsonResponse.c_str());
-        sendMessage(statusTopic.c_str(), jsonResponse.c_str());
+        sendMessage(statusTopic, jsonResponse);
     }
     else if (topicStr.startsWith("control/soil-moisture/")) {
-        SoilMoistureStatus soilMoistureStatus = mqttServiceInstance.soilMoistureController.handleControlMessage(message);
+        SoilMoistureStatus soilMoistureStatus = soilMoistureController.handleControlMessage(message);
         statusTopic = "status/soil-moisture/";
-        Serial.print("Soil moisture status: ");
         jsonResponse = soilMoistureStatus.toJson();
-        Serial.println(jsonResponse.c_str());
-        sendMessage(statusTopic.c_str(), jsonResponse.c_str());
+        sendMessage(statusTopic, jsonResponse);
     }
     else {
         Serial.println("Unknown topic: " + topicStr);
     }
 }
 
-
 void MQTTService::sendLog(const String& message) {
     String topic = "status/esp32/smartgarden/";    
-    // Publish the message to the specified topic
-    mqttClient.publish(topic.c_str(), message.c_str());
+    sendMessage(topic, message);
 }

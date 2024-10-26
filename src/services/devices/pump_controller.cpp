@@ -78,23 +78,51 @@ void PumpController::updatePump(int pumpId) {
     }
 }
 
-PumpStatus PumpController::handleControlMessage(int pumpId, String message) {
+PumpStatus PumpController::handleControlMessage(String message) {
     PumpStatus status;
-    String statusTopic = "status/pump/" + String(pumpId);
+
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, message);
+
+    if (error) {
+        Serial.print("Failed to parse JSON: ");
+        Serial.println(error.c_str());
+        status.message = error.c_str();
+        status.success = false;
+        return status;
+    }
+
+    if (doc.containsKey("RequestId")) {
+        status.requestId = doc["RequestId"].as<String>();
+    } else {
+        Serial.println("RequestId not found in message");
+        status.message = "RequestId not found in message";
+        status.success = false;
+        return status;
+    }
+
+    if (doc.containsKey("PumpId")) {
+        status.pumpId = doc["PumpId"].as<int>();
+    } else {
+        Serial.println("PumpId not found in message");
+        status.message = "PumpId not found in message";
+        status.success = false;
+        return status;
+    }
 
     Serial.print("Requested pump ID: ");
-    Serial.println(pumpId);
+    Serial.println(status.pumpId);
 
-    if (pumpId >= 0 && pumpId < 2) {
-        if (startPump(pumpId, 0)) { //todo: get min interval from config?
+    if (status.pumpId >= 0 && status.pumpId < 2) {
+        if (startPump(status.pumpId, 0)) { //todo: get min interval from config?
             Serial.print("Pump ");
-            Serial.print(pumpId);
+            Serial.print(status.pumpId);
             Serial.println(" started successfully.");
             status.success = true;
             status.message = "Pump started";
         } else {
             Serial.print("Pump ");
-            Serial.print(pumpId);
+            Serial.print(status.pumpId);
             Serial.println(" could not be started.");
             status.success = false;
             status.message = "Pump cannot be started now";
