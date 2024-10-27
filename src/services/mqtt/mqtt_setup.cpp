@@ -19,7 +19,7 @@ void MQTTService::setupMQTT(Config *config) {
         Serial.println("Connected to MQTT");
     } else {
         Serial.println("Failed to connect to MQTT");
-        delay(10000);
+        delay(config->mqttReconnectDelay);
         ESP.restart();
     }
 }
@@ -52,7 +52,7 @@ bool MQTTService::connectToMQTT() {
 void MQTTService::loop() {
     if (!mqttClient.connected()) {
         unsigned long now = millis();
-        if (now - lastReconnectAttempt > 5000) { // Attempt to reconnect every 5 seconds
+        if (now - lastReconnectAttempt > config->mqttReconnectInterval) { // Attempt to reconnect every 5 seconds
             lastReconnectAttempt = now;
             if (connectToMQTT()) {
                 lastReconnectAttempt = 0; // Reset the reconnect attempt time

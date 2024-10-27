@@ -7,7 +7,8 @@ PumpController::PumpController() {}
 
 void PumpController::setupPump(Config *config) {
     setPumps(config->pumps, 2); //todo: need move 2
-    maxPumpDuration = config->pumpMaxPumpDuration;
+    minIntervalDefault = config->minIntervalDefault;
+    pumpDurationDefault = config->pumpDurationDefault;
 }
 
 void PumpController::setPumps(Pump* configPumps, int numPumps) {
@@ -18,41 +19,42 @@ void PumpController::setPumps(Pump* configPumps, int numPumps) {
     }
 }
 
-bool PumpController::startPump(int pumpId, int minInterval) {
+bool PumpController::startPump(int pumpId, int minInterval, unsigned long duration) {
     unsigned long currentTime = millis();
     Pump &pump = pumps[pumpId];
-    
-    Serial.print("Pump lastStartTime: ");
-    Serial.println(pump.lastStartTime);
     
     if (!pump.isRunning && (currentTime - pump.lastStartTime >= minInterval)) {
         digitalWrite(pump.pin, HIGH);
         pump.lastStartTime = currentTime;
+        pump.startTime = currentTime;
+        pump.runDuration = duration;
         pump.isRunning = true;
+        
         Serial.println("Pump started successfully.");
-        Serial.print("Pump pin: ");
-        Serial.println(pump.pin);
-        Serial.print("Start time: ");
-        Serial.println(currentTime);
         return true;
     } else {
         if (pump.isRunning) {
+            unsigned long timeElapsed = currentTime - pump.startTime;
+            unsigned long timeRemaining = (timeElapsed < pump.runDuration) ? (pump.runDuration - timeElapsed) : 0;
+            
             Serial.println("Pump is already running.");
+            Serial.print("Time elapsed: ");
+            Serial.println(timeElapsed);
+            Serial.print("Time remaining: ");
+            Serial.println(timeRemaining);
         } else {
             Serial.println("Pump cannot be started due to minimum interval restriction.");
-            Serial.print("Time since last start: ");
-            Serial.println(currentTime - pump.lastStartTime);
-            Serial.print("Minimum interval: ");
-            Serial.println(minInterval);
         }
     }
     return false;
 }
 
+
 void PumpController::stopPump(int pumpId) {
     Pump &pump = pumps[pumpId];
     digitalWrite(pump.pin, LOW); // todo: fix
     pump.isRunning = false;
+    pump.lastStartTime = millis();
     Serial.println("Pump stopped.");
 }
 
@@ -65,25 +67,37 @@ void PumpController::updateAllPumps() {
 void PumpController::updatePump(int pumpId) {
     unsigned long currentTime = millis();
     Pump &pump = pumps[pumpId];
-    if (pump.isRunning && (currentTime - pump.lastStartTime >= maxPumpDuration)) {
-        stopPump(pumpId);
-        Serial.print("currentTime: ");
-        Serial.print(currentTime);
-        Serial.print(" lastStartTime: ");
-        Serial.print(pump.lastStartTime);
-        Serial.print(" maxPumpDuration: ");
-        Serial.println(maxPumpDuration);
-        Serial.println("Pump stopped automatically due to max duration.");
-        mqttServiceInstance.sendLog("Pump stopped automatically due to max duration.");
+    
+    if (pump.isRunning) {
+        unsigned long timeElapsed = currentTime - pump.startTime;
+
+        if (timeElapsed >= pump.runDuration) {
+            stopPump(pumpId);
+            Serial.print("Pump ");
+            Serial.print(pumpId);
+            Serial.println(" stopped automatically due to duration expiration.");
+            mqttServiceInstance.sendLog("Pump " + String(pumpId) + " stopped automatically due to duration expiration.");
+        } else {
+            unsigned long timeRemaining = pump.runDuration - timeElapsed;
+            Serial.print("Pump ");
+            Serial.print(pumpId);
+            Serial.print(" is running. Time elapsed: ");
+            Serial.print(timeElapsed);
+            Serial.print(" ms, Time remaining: ");
+            Serial.print(timeRemaining);
+            Serial.println(" ms.");
+        }
     }
 }
 
+
+// Handle control message (returns the sensor status)
 PumpStatus PumpController::handleControlMessage(String message) {
     PumpStatus status;
-
+    
     JsonDocument doc;
     DeserializationError error = deserializeJson(doc, message);
-
+    
     if (error) {
         Serial.print("Failed to parse JSON: ");
         Serial.println(error.c_str());
@@ -91,7 +105,7 @@ PumpStatus PumpController::handleControlMessage(String message) {
         status.success = false;
         return status;
     }
-
+    
     if (doc.containsKey("RequestId")) {
         status.requestId = doc["RequestId"].as<String>();
     } else {
@@ -100,7 +114,7 @@ PumpStatus PumpController::handleControlMessage(String message) {
         status.success = false;
         return status;
     }
-
+    
     if (doc.containsKey("PumpId")) {
         status.pumpId = doc["PumpId"].as<int>();
     } else {
@@ -109,29 +123,62 @@ PumpStatus PumpController::handleControlMessage(String message) {
         status.success = false;
         return status;
     }
-
+    
+    unsigned long duration = doc.containsKey("Duration") ? doc["Duration"].as<unsigned long>() : pumpDurationDefault;
+    
     Serial.print("Requested pump ID: ");
     Serial.println(status.pumpId);
+    
+    int minInterval = minIntervalDefault;
 
     if (status.pumpId >= 0 && status.pumpId < 2) {
-        if (startPump(status.pumpId, 0)) { //todo: get min interval from config?
+        unsigned long currentTime = millis();
+        Pump &pump = pumps[status.pumpId];
+        
+        if (!pump.isRunning && (currentTime - pump.lastStartTime >= minInterval)) {
+            startPump(status.pumpId, minInterval, duration);
+            status.success = true;
+            status.message = "Pump started";
+            status.timeElapsed = 0;
+            status.timeRemaining = duration;
+            status.minInterval = minInterval;
+            
             Serial.print("Pump ");
             Serial.print(status.pumpId);
             Serial.println(" started successfully.");
-            status.success = true;
-            status.message = "Pump started";
         } else {
+            status.success = false;
+            unsigned long timeElapsed = pump.isRunning ? (currentTime - pump.startTime) : 0;
+            unsigned long timeRemaining = pump.isRunning ? (pump.runDuration - timeElapsed) : 0;
+            unsigned long timeSinceLastStart = currentTime - pump.lastStartTime;
+            
+            if (pump.isRunning) {
+                status.message = "Pump is already running";
+                status.timeElapsed = timeElapsed;
+                status.timeRemaining = timeRemaining;
+            } else {
+                status.message = "Pump cannot be started now due to min interval restriction";
+                status.timeElapsed = timeSinceLastStart;
+                status.timeRemaining = minInterval - timeSinceLastStart;
+            }
+            
+            status.minInterval = minInterval;
+            
             Serial.print("Pump ");
             Serial.print(status.pumpId);
             Serial.println(" could not be started.");
-            status.success = false;
-            status.message = "Pump cannot be started now";
+            Serial.print("Time elapsed: ");
+            Serial.println(status.timeElapsed);
+            Serial.print("Time remaining: ");
+            Serial.println(status.timeRemaining);
+            Serial.print("Minimum interval: ");
+            Serial.println(status.minInterval);
         }
     } else {
         Serial.println("Invalid pump ID received.");
         status.success = false;
         status.message = "Invalid pump ID";
     }
-
+    
     return status;
 }

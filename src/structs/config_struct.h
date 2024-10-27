@@ -11,20 +11,23 @@ struct Config {
   String deviceKey;
   String deviceName;
 
+  String taskName;
   int udpPort;
   int udpDelayTimeMs;
+  unsigned long taskStackSize;
 
   int webServerPort;
 
   Pump pumps[2];
-  int pumpMaxPumpDuration;
-  int pumpMinInterval;
+  unsigned long pumpDurationDefault;
+  unsigned long minIntervalDefault;
 
   String mqttServer;
   int mqttPort;
   String mqttUser;
   String mqttPassword;
-  int mqttTryAgain;
+  unsigned long mqttReconnectInterval;
+  unsigned long mqttReconnectDelay;
 
   String otaPassword;
 
@@ -44,8 +47,10 @@ struct Config {
     doc["deviceKey"] = deviceKey;
     doc["deviceName"] = deviceName;
 
+    doc["taskName"] = taskName;
     doc["udpPort"] = udpPort;
     doc["udpDelayTimeMs"] = udpDelayTimeMs;
+    doc["taskStackSize"] = taskStackSize;
 
     doc["webServerPort"] = webServerPort;
 
@@ -58,14 +63,15 @@ struct Config {
       pumpObj["isRunning"] = pumps[i].isRunning;
     }
 
-    doc["pumpMaxPumpDuration"] = pumpMaxPumpDuration;
-    doc["pumpMinInterval"] = pumpMinInterval;
+    doc["pumpDurationDefault"] = pumpDurationDefault;
+    doc["minIntervalDefault"] = minIntervalDefault;
 
     doc["mqttServer"] = mqttServer;
     doc["mqttPort"] = mqttPort;
     doc["mqttUser"] = mqttUser;
     doc["mqttPassword"] = mqttPassword;
-    doc["mqttTryAgain"] = mqttTryAgain;
+    doc["mqttReconnectInterval"] = mqttReconnectInterval;
+    doc["mqttReconnectDelay"] = mqttReconnectDelay;
 
     doc["otaPassword"] = otaPassword;
 

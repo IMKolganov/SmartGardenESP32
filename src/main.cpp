@@ -31,7 +31,7 @@ void initializeModule() {
     mqttServiceInstance.setupMQTT(&config);
 
     // Create a task for UDP Broadcast
-    initializeUDPBroadcastModule(config.udpPort, config.udpDelayTimeMs);
+    initializeUDPBroadcastModule(config.udpPort, config.udpDelayTimeMs, config.taskName, config.taskStackSize);
 
     Serial.println("HTTP server started");
     mqttServiceInstance.sendLog("HTTP server started");

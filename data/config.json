@@ -3,8 +3,11 @@
     "password": "2B71DEB733A61D61",
     "deviceKey": "123e4567-e89b-12d3-a456-426614174000",
     "deviceName": "SmartGarden",
+
+    "taskName": "UDP Task",
     "udpPort": 6000,
     "udpDelayTimeMs": 50000,
+    "taskStackSize": 10000,
     "webServerPort": 80,
     "pumps": [
         {
@@ -18,14 +21,15 @@
             "isRunning": false
         }
     ],
-    "pumpMaxPumpDuration": 30000,
-    "pumpMinInterval": 60000,
+    "pumpDurationDefault": 5000,
+    "minIntervalDefault": 5000,
     "mqttServer": "192.168.0.2",
     "mqttPort": 1883,
     "mqttUser": "guest",
     "mqttPassword": "guest",
-    "mqttTryAgain": 5000,
     "otaPassword": "SmartGarden",
+    "mqttReconnectInterval" : 5000,
+    "mqttReconnectDelay" : 10000,
 
     "dhtPin": 4,
     "dhtType": 11,

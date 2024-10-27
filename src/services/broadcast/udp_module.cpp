@@ -5,8 +5,10 @@
 WiFiUDP udp;
 
 struct UDPParams {
+    String taskName;
     int udpPort;
     int delayTimeMs;
+    unsigned long taskStackSize;
 };
 
 IPAddress calculateBroadcastIP() {
@@ -20,18 +22,20 @@ IPAddress calculateBroadcastIP() {
     return broadcastIP;
 }
 
-void initializeUDPBroadcastModule(const int udpPort, const int delayTimeMs) {
+void initializeUDPBroadcastModule(const int udpPort, const int delayTimeMs, const String taskName, const unsigned long taskStackSize) {
     Serial.println("Booting");
 
     UDPParams *udpParams = new UDPParams;
+    udpParams->taskName = taskName;
     udpParams->udpPort = udpPort;
     udpParams->delayTimeMs = delayTimeMs;
+    udpParams->taskStackSize = taskStackSize;
 
     // Create a task for UDP Broadcast
     xTaskCreatePinnedToCore(
         udpTask,    // Pointer to the task function
-        "UDP Task", // Task name
-        10000,      // Task stack size
+        udpParams->taskName.c_str(), // Task name
+        udpParams->taskStackSize,      // Task stack size
         udpParams,  // Parameters for the task function
         1,          // Task priority
         NULL,       // Task handle

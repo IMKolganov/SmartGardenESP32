@@ -12,7 +12,7 @@ public:
 
     // Methods for pump control
     void setupPump(Config *config); // Initialize the pump
-    bool startPump(int pumpId, int minInterval); // Start the pump with a minimum interval
+    bool startPump(int pumpId, int minInterval, unsigned long duration); // Start the pump with a minimum interval
     void stopPump(int pumpId); // Stop the pump
     void updatePump(int pumpId); // Update the pump state based on duration
     void updateAllPumps();
@@ -30,6 +30,8 @@ private:
     Pump pumps[2];
 
     int maxPumpDuration;
+    unsigned long minIntervalDefault;
+    unsigned long pumpDurationDefault;
 };
 
 #endif // PUMP_CONTROLLER_H

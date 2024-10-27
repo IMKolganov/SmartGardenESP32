@@ -9,6 +9,9 @@ struct PumpStatus {
     int pumpId;
     bool success;
     String message;
+    unsigned long timeElapsed; // Time elapsed since startup
+    unsigned long timeRemaining; // Remaining running time
+    unsigned long minInterval; // Minimum interval between startups
 
     String toJson() const {
         JsonDocument doc;
@@ -16,6 +19,9 @@ struct PumpStatus {
         doc["PumpId"] = pumpId;        
         doc["Success"] = success;        
         doc["Message"] = message;
+        doc["TimeElapsed"] = timeElapsed;
+        doc["TimeRemaining"] = timeRemaining;
+        doc["MinInterval"] = minInterval;
 
         // Serialize JsonDocument to a String
         String jsonString;

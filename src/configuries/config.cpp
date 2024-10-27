@@ -32,9 +32,11 @@ if (error) {
   config.ssid = doc["ssid"].as<String>();
   config.password = doc["password"].as<String>();
   config.deviceKey = doc["deviceKey"].as<String>();
-  config.deviceName = doc["deviceName"].as<String>();
+  config.deviceName = doc["deviceName"].as<String>();  
+  config.taskName = doc["taskName"].as<String>();
   config.udpPort = doc["udpPort"].as<int>();
   config.udpDelayTimeMs = doc["udpDelayTimeMs"].as<int>();
+  config.taskStackSize = doc["taskStackSize"].as<unsigned long>();
   config.webServerPort = doc["webServerPort"].as<int>();
   
   // Load pumps from the JSON array
@@ -47,14 +49,15 @@ if (error) {
     config.pumps[i].isRunning = pumpObj["isRunning"].as<bool>();
     i++;
   }
-  config.pumpMaxPumpDuration = doc["pumpMaxPumpDuration"].as<int>();
-  config.pumpMinInterval = doc["pumpMinInterval"].as<int>();
+  config.pumpDurationDefault = doc["pumpDurationDefault"].as<unsigned long>();
+  config.minIntervalDefault = doc["minIntervalDefault"].as<unsigned long>();
 
   config.mqttServer = doc["mqttServer"].as<String>();
   config.mqttPort = doc["mqttPort"].as<int>();
   config.mqttUser = doc["mqttUser"].as<String>();
   config.mqttPassword = doc["mqttPassword"].as<String>();
-  config.mqttTryAgain = doc["mqttTryAgain"].as<int>();
+  config.mqttReconnectInterval = doc["mqttReconnectInterval"].as<unsigned long>();
+  config.mqttReconnectDelay = doc["mqttReconnectDelay"].as<unsigned long>();  
 
   config.otaPassword = doc["otaPassword"].as<String>();
 
