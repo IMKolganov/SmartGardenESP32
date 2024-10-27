@@ -17,6 +17,30 @@ void DhtController::setupDht(Config *config) {
 // Handle control message (returns the sensor status)
 DhtStatus DhtController::handleControlMessage(String message) {
     DhtStatus status;
+    
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, message);
+
+    if (error) {
+        Serial.print("Failed to parse JSON: ");
+        Serial.println(error.c_str());
+        status.message = error.c_str();
+        status.success = false;
+        return status;
+    }
+
+    if (doc.containsKey("RequestId")) {
+        status.requestId = doc["RequestId"].as<String>();
+    } else {
+        Serial.println("RequestId not found in message");
+        status.message = "RequestId not found in message";
+        status.success = false;
+        return status;
+    }
+
+    if (doc.containsKey("SensorId")) {
+        status.sensorId = doc["SensorId"].as<int>();
+    }
 
     // Read temperature and humidity from the sensor
     float humidity = dht->readHumidity();
@@ -28,7 +52,7 @@ DhtStatus DhtController::handleControlMessage(String message) {
         status.success = false;
         status.temperature = 0;
         status.humidity = 0;
-        status.errorMessage = "Error reading data from DHT";
+        status.message = "Error reading data from DHT";
     } else {
         Serial.print("Temperature: ");
         Serial.print(temperature);

@@ -5,15 +5,17 @@
 #include <ArduinoJson.h>
 
 struct PumpStatus {
+    String requestId;
+    int pumpId;
     bool success;
     String message;
 
     String toJson() const {
         JsonDocument doc;
-
-        // Populate the JsonDocument
-        doc["success"] = success;
-        doc["message"] = message;
+        doc["RequestId"] = requestId;
+        doc["PumpId"] = pumpId;        
+        doc["Success"] = success;        
+        doc["Message"] = message;
 
         // Serialize JsonDocument to a String
         String jsonString;

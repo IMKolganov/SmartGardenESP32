@@ -12,23 +12,44 @@ void SoilMoistureController::setupSoilMoisture(Config *config) {
 }
 
 // Handle control message (returns the sensor status)
+#include <ArduinoJson.h>
+
 SoilMoistureStatus SoilMoistureController::handleControlMessage(String message) {
     SoilMoistureStatus status;
-    
-    int sensorValue = analogRead(sensorPin); // Read the sensor value
+
+    JsonDocument doc;
+    DeserializationError error = deserializeJson(doc, message);
+
+    if (error) {
+        Serial.print("Failed to parse JSON: ");
+        Serial.println(error.c_str());
+        status.message = error.c_str();
+        status.success = false;
+        return status;
+    }
+
+    if (doc.containsKey("RequestId")) {
+        status.requestId = doc["RequestId"].as<String>();
+    } else {
+        Serial.println("RequestId not found in message");
+        status.message = "RequestId not found in message";
+        status.success = false;
+        return status;
+    }
+
+    if (doc.containsKey("SensorId")) {
+        status.sensorId = doc["SensorId"].as<int>();
+    }
+
+    int sensorValue = analogRead(sensorPin);
     Serial.print("Soil moisture sensor value: ");
     Serial.println(sensorValue);
 
-    // Convert the sensor value to percentage or any other meaningful unit
-    // Assuming the sensor value is between 0 and 1023 (typical for analog sensors)
-    status.moistureLevel = map(sensorValue, 0, 1023, 0, 100); // Convert to percentage
-
-    // Print to Serial for debugging
+    status.moistureLevel = map(sensorValue, 0, 1023, 0, 100);
     Serial.print("Moisture Level: ");
     Serial.print(status.moistureLevel);
     Serial.println("%");
 
-    // Set success status
     status.success = true;
 
     return status;

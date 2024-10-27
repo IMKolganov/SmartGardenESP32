@@ -18,7 +18,7 @@ public:
     void updateAllPumps();
 
     // Method to handle MQTT control messages
-    PumpStatus handleControlMessage(int pumpId, String message);
+    PumpStatus handleControlMessage(String message);
 
     // Getter methods
     bool isRunning() const;
