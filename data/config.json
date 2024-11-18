@@ -11,12 +11,12 @@
     "webServerPort": 80,
     "pumps": [
         {
-            "pin": 2,
+            "pin": 26,
             "lastStartTime": 0,
             "isRunning": false
         },
         {
-            "pin": 3,
+            "pin": 27,
             "lastStartTime": 0,
             "isRunning": false
         }

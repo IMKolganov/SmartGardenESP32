@@ -79,13 +79,13 @@ void PumpController::updatePump(int pumpId) {
             mqttServiceInstance.sendLog("Pump " + String(pumpId) + " stopped automatically due to duration expiration.");
         } else {
             unsigned long timeRemaining = pump.runDuration - timeElapsed;
-            Serial.print("Pump ");
-            Serial.print(pumpId);
-            Serial.print(" is running. Time elapsed: ");
-            Serial.print(timeElapsed);
-            Serial.print(" ms, Time remaining: ");
-            Serial.print(timeRemaining);
-            Serial.println(" ms.");
+            // Serial.print("Pump ");
+            // Serial.print(pumpId);
+            // Serial.print(" is running. Time elapsed: ");
+            // Serial.print(timeElapsed);
+            // Serial.print(" ms, Time remaining: ");
+            // Serial.print(timeRemaining);
+            // Serial.println(" ms.");
         }
     }
 }
